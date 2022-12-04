@@ -7,7 +7,6 @@
 #include "tf2_ros/transform_broadcaster.h"
 #include <string>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <rclcpp/qos.hpp>
 #include <tf2/LinearMath/Matrix3x3.h>
 
 // using namespace std::placeholders;
@@ -15,7 +14,8 @@
 class OdomSubscriber : public rclcpp::Node {
     public:
         OdomSubscriber(): Node("odom_sub") {
-
+            // Initialize the transform broadcaster
+            m_tf_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(*this);
             // Create odom subscriber
             mOdomSub = create_subscription<nav_msgs::msg::Odometry>("/robot1/odom", 10, std::bind(&OdomSubscriber::odomCallback, this, std::placeholders::_1) );
         }
@@ -37,8 +37,6 @@ class OdomSubscriber : public rclcpp::Node {
             t.transform.translation.y = msg->pose.pose.position.y;
             t.transform.translation.z = msg->pose.pose.position.z;
 
-            // tf2::Quaternion q;
-            // q.setRPY(0, 0, 0);
             t.transform.rotation.x = msg->pose.pose.orientation.x;
             t.transform.rotation.y = msg->pose.pose.orientation.y;
             t.transform.rotation.z = msg->pose.pose.orientation.z;
@@ -50,7 +48,6 @@ class OdomSubscriber : public rclcpp::Node {
 
     private:
         std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_broadcaster;
-
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr mOdomSub;
     };
 
@@ -61,9 +58,12 @@ int main(int argc, char *argv[])
     // init
     rclcpp::init(argc, argv);
     // node
-    auto node = std::make_shared<OdomSubscriber>( );
+
+
+    auto node = std::make_shared<OdomSubscriber>();
     rclcpp::spin(node);
     // rclcpp::spin(std::make_shared<OdomSubscriber>());
+
 
     // shutdown
     rclcpp::shutdown();

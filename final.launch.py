@@ -143,13 +143,21 @@ def generate_launch_description():
         package='world_odom_broadcaster',
         executable='world_odom_broadcaster',
         output='screen')
-        
-        
     start_odom_footprint_broadcaster_cmd = Node(
         package='odom_updater',
         executable='odom_footprint_broadcaster',
         output='screen') 
-
+    final_project_params = os.path.join(
+        get_package_share_directory('target_reacher'),
+        'params',
+        'final_params.yaml'
+    )
+    
+    start_target_reacher = Node(
+        package='target_reacher',
+        executable='target_reacher',
+        parameters=[final_project_params],
+        output='screen')
     
     start_aruco_detection_node_cmd = Node(
         package='ros2_aruco',
@@ -243,8 +251,7 @@ def generate_launch_description():
     ld.add_action(declare_use_robot_state_pub_cmd)
 
     # Add the actions to start gazebo, robots and simulations
-    ld.add_action(start_gazebo_cmd)
-    ld.add_action(start_rviz_cmd)
+    
 
     for spawn_robot_cmd in spawn_robots_cmds:
         ld.add_action(spawn_robot_cmd)
@@ -252,10 +259,13 @@ def generate_launch_description():
     for simulation_instance_cmd in nav_instances_cmds:
         ld.add_action(simulation_instance_cmd)
         
-    ld.add_action(start_odom_footprint_broadcaster_cmd)
+    # ld.add_action(start_odom_updater_cmd)
     ld.add_action(start_world_odom_broadcaster_cmd)
+    ld.add_action(start_odom_footprint_broadcaster_cmd)
     ld.add_action(start_aruco_detection_node_cmd)
-    #ld.add_action(start_odom_footprint_broadcaster_cmd)
-    # ld.add_action(start_target_reacher)
+    ld.add_action(start_target_reacher)
+    
+    ld.add_action(start_gazebo_cmd)
+    ld.add_action(start_rviz_cmd)
 
     return ld
