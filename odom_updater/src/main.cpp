@@ -23,12 +23,16 @@ class OdomSubscriber : public rclcpp::Node {
     protected:
         void broadcast_odom_footprint(geometry_msgs::msg::TransformStamped t)
         {
+            
+            // This function is used for send the tf, I write this function is because the pdf said we need to call a function
+            
             m_tf_broadcaster->sendTransform(t);
         }
         void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+            // initialize the tf
             geometry_msgs::msg::TransformStamped t;
 
-
+            // save the odom value to TransformStamped
             t.header.stamp = this->get_clock()->now();
             t.header.frame_id = "/robot1/odom";
             t.child_frame_id = "/robot1/base_footprint";
@@ -41,13 +45,19 @@ class OdomSubscriber : public rclcpp::Node {
             t.transform.rotation.y = msg->pose.pose.orientation.y;
             t.transform.rotation.z = msg->pose.pose.orientation.z;
             t.transform.rotation.w = msg->pose.pose.orientation.w;
-            m_tf_broadcaster->sendTransform(t);
-            // OdomSubscriber::broadcast_odom_footprint(t);
+
+            // send the transformation
+            // m_tf_broadcaster->sendTransform(t);
+            
+            // use this one should be fine?  
+            OdomSubscriber::broadcast_odom_footprint(t);
 
         }
 
     private:
+        // tf broadcaster
         std::shared_ptr<tf2_ros::TransformBroadcaster> m_tf_broadcaster;
+        // odom subscriber
         rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr mOdomSub;
     };
 
@@ -59,8 +69,9 @@ int main(int argc, char *argv[])
     rclcpp::init(argc, argv);
     // node
 
-
+    // create the odom subscriber node
     auto node = std::make_shared<OdomSubscriber>();
+    // run the node
     rclcpp::spin(node);
     // rclcpp::spin(std::make_shared<OdomSubscriber>());
 
