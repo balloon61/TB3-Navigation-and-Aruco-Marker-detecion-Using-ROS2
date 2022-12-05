@@ -30,16 +30,18 @@ public:
         double x2 = this->declare_parameter<double>("final_destination.aruco_2.x");
         double y2 = this->declare_parameter<double>("final_destination.aruco_2.y");
         double x3 = this->declare_parameter<double>("final_destination.aruco_3.x");
-        double y3 = this->declare_parameter<double>("final_destination.aruco_3.y");    
+        double y3 = this->declare_parameter<double>("final_destination.aruco_3.y");
+
+        // move the robot    
         m_bot_controller->set_goal(x0, y0);
-        // mOdomSub = create_subscription<std_msgs/msg/Bool>("/robot1/odom", 10, std::bind(&OdomSubscriber::odomCallback, this, std::placeholders::_1) );
+        reach_goal = create_subscription<std_msgs::msg::Bool>("/goal_reached", 10, std::bind(&TargetReacher::GoalCallback, this, std::placeholders::_1) );
 
     }
-    // void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
-
+    void GoalCallback(const std_msgs::msg::Bool::SharedPtr msg);
+    void rotate();
 private:
     // attributes
     std::shared_ptr<BotController> m_bot_controller;
-    // rclcpp::Subscription<std_msgs/msg/Bool>::SharedPtr reach_goal;
-
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr reach_goal;
+    bool rg = false;
 };
