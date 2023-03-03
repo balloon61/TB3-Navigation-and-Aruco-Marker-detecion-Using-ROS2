@@ -1,4 +1,3 @@
-# ROS2
 ## Introduction
 The aim of this project is to lead a Turtlebot from its spawning location to an intermediary goal and ultimately to a final goal. The position of the intermediary goal is given to the robot & the information about the final goal is decoded by the robot itself (using a fiducial marker) when it is at the intermediary goal.
 
